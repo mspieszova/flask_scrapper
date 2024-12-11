@@ -18,7 +18,8 @@
     <div id="results"></div>
 
     <!-- Tlačítko pro stažení výsledků -->
-    <button id="download-results" style="display: none;">Stáhnout výsledky</button>
+    <button id="download-results" style="display: none; margin-top: 20px;">Stáhnout výsledky</button>
+
 
     <!-- JavaScript -->
     <script>
@@ -37,7 +38,6 @@
                 resultsDiv.innerHTML += `
                     <div>
                         <h3>${result.title}</h3>
-                        <p>${result.snippet}</p>
                         <a href="${result.link}" target="_blank">${result.link}</a>
                     </div>
                 `;
