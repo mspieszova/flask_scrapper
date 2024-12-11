@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vyhledávání na Googlu</title>
+</head>
+<body>
+    <h1>Vyhledávač Google</h1>
+    <form id="search-form">
+        <label for="query">Zadejte klíčová slova pro vyhledávání</label>
+        <input type="text" id="query" name="query" required>
+        <button type="submit">Hledat</button>
+    </form>
+    <div id="results"></div>
+    <script>
+        document.getElementById("search-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const query = document.getElementById("query").value;
+            const response = await fetch(`/search?query=${encodeURIComponent(query)}`);
+            const results = await response.json();
+            const resultsDiv = document.getElementById("results");
+            resultsDiv.innerHTML = `<h2>Výsledky:</h2><pre>${JSON.stringify(results, null, 2)}</pre>`;
+        });
+        document.getElementById("search-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const query = document.getElementById("query").value;
+            const response = await fetch(`/search?query=${encodeURIComponent(query)}`);
+            const results = await response.json();
+            
+            // Display results
+            const resultsDiv = document.getElementById("results");
+            resultsDiv.innerHTML = `<h2>Výsledky:</h2><pre>${JSON.stringify(results, null, 2)}</pre>`;
+            
+            // Save results to the server
+            await fetch('/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(results)
+            });
+            alert("Results have been saved!");
+        });
+
+    </script>
+</body>
+</html>
