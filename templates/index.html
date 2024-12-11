@@ -17,32 +17,27 @@
         document.getElementById("search-form").addEventListener("submit", async (event) => {
             event.preventDefault();
             const query = document.getElementById("query").value;
-            const response = await fetch(`/search?query=${encodeURIComponent(query)}`);
-            const results = await response.json();
-            const resultsDiv = document.getElementById("results");
-            resultsDiv.innerHTML = `<h2>Výsledky:</h2><pre>${JSON.stringify(results, null, 2)}</pre>`;
-        });
-        document.getElementById("search-form").addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const query = document.getElementById("query").value;
+            
+            // Provádí hledání na serveru
             const response = await fetch(`/search?query=${encodeURIComponent(query)}`);
             const results = await response.json();
             
-            // Display results
+            // Zobrazení výsledků na stránce
             const resultsDiv = document.getElementById("results");
             resultsDiv.innerHTML = `<h2>Výsledky:</h2><pre>${JSON.stringify(results, null, 2)}</pre>`;
-            resultsDiv.innerHTML = `<h1>Výsledky budouuloženy do:</h1><pre>${JSON.stringify(RESULTS_DIR, null, 2)}</pre>`
             
-            // Save results to the server
-            await fetch('/save', {
+            // Uložení výsledků na server
+            const saveResponse = await fetch('/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(results)
             });
-            alert("Results have been saved!")
-            ;
+            const saveData = await saveResponse.json();
+    
+            // Zobrazení cesty k uloženému souboru
+            resultsDiv.innerHTML += `<h3>Výsledky byly uloženy do souboru:</h3><pre>${saveData.file_path}</pre>`;
+            alert("Výsledky byly uloženy do souboru!");
         });
-
     </script>
 </body>
 </html>

@@ -7,23 +7,31 @@ import os
 app = Flask(__name__)
 
 # Cesta ke složce "vysledky" v kořenovém adresáři
-RESULTS_DIR = os.path.join(os.getcwd(), "result")
+RESULTS_DIR = "C://vysledky" 
+RESULTS_FILE = os.path.join(RESULTS_DIR, "vysledky.json")
+print("cesta k souboru")
 
 # Funkce pro vytvoření složky, pokud neexistuje
 if not os.path.exists(RESULTS_DIR):
     os.makedirs(RESULTS_DIR)
+    print("tvořim složku")
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
 @app.route('/save', methods=['POST'])
+@app.route('/save', methods=['POST'])
 def save():
     data = request.json
-    output_file = os.path.join(RESULTS_DIR, 'results.json')
-    with open(output_file, 'w', encoding='utf-8') as f:
+    # Uložení dat do JSON souboru
+    with open(RESULTS_FILE, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
-    return jsonify({"message": "Data byla uložena v složce 'vysledky'."})
+    
+    # Převod cesty na standardní formát s lomítky dopředu
+    formatted_path = RESULTS_FILE.replace("\\", "/")
+    return jsonify({"message": "Data byla uložena.", "file_path": formatted_path})
+
 
 @app.route('/search', methods=['GET'])
 def search():
