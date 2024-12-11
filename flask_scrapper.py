@@ -2,22 +2,28 @@ from flask import Flask, request, jsonify, render_template
 import requests
 from bs4 import BeautifulSoup
 import json
+import os
 
 app = Flask(__name__)
+
+# Cesta ke složce "vysledky" v kořenovém adresáři
+RESULTS_DIR = os.path.join(os.getcwd(), "result")
+
+# Funkce pro vytvoření složky, pokud neexistuje
+if not os.path.exists(RESULTS_DIR):
+    os.makedirs(RESULTS_DIR)
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
 @app.route('/save', methods=['POST'])
-def save_results():
-    """
-    Save JSON data to a file when received via POST request.
-    """
+def save():
     data = request.json
-    with open('results.json', 'w', encoding='utf-8') as f:
+    output_file = os.path.join(RESULTS_DIR, 'results.json')
+    with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
-    return jsonify({"message": "Data byla uložena"})
+    return jsonify({"message": "Data byla uložena v složce 'vysledky'."})
 
 @app.route('/search', methods=['GET'])
 def search():
