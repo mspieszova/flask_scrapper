@@ -38,7 +38,8 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(results)
             });
-            alert("Results have been saved!");
+            alert("Results have been saved!")
+            resultsDiv.innerHTML = `<h2>Výsledky:</h2><pre>${JSON.stringify(RESULTS_DIR, null, 2)}</pre>`;
         });
 
     </script>
