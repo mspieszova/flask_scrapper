@@ -3,41 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vyhledávání na Googlu</title>
+    <title>Vyhledávač Google</title>
 </head>
 <body>
     <h1>Vyhledávač Google</h1>
+    <!-- Formulář pro zadání klíčových slov -->
     <form id="search-form">
-        <label for="query">Zadejte klíčová slova pro vyhledávání</label>
+        <label for="query">Zadejte klíčová slova pro vyhledávání:</label>
         <input type="text" id="query" name="query" required>
         <button type="submit">Hledat</button>
     </form>
+
+    <!-- Div pro zobrazení výsledků -->
     <div id="results"></div>
+
+    <!-- Tlačítko pro stažení výsledků -->
+    <button id="download-results" style="display: none;">Stáhnout výsledky</button>
+
+    <!-- JavaScript -->
     <script>
         document.getElementById("search-form").addEventListener("submit", async (event) => {
             event.preventDefault();
             const query = document.getElementById("query").value;
             
-            // Provádí hledání na serveru
+            // Odeslání požadavku na server
             const response = await fetch(`/search?query=${encodeURIComponent(query)}`);
             const results = await response.json();
             
             // Zobrazení výsledků na stránce
             const resultsDiv = document.getElementById("results");
-            resultsDiv.innerHTML = `<h2>Výsledky:</h2><pre>${JSON.stringify(results, null, 2)}</pre>`;
-            
-            // Uložení výsledků na server
-            const saveResponse = await fetch('/save', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(results)
+            resultsDiv.innerHTML = `<h2>Výsledky:</h2>`;
+            results.forEach(result => {
+                resultsDiv.innerHTML += `
+                    <div>
+                        <h3>${result.title}</h3>
+                        <p>${result.snippet}</p>
+                        <a href="${result.link}" target="_blank">${result.link}</a>
+                    </div>
+                `;
             });
-            const saveData = await saveResponse.json();
-    
-            // Zobrazení cesty k uloženému souboru
-            resultsDiv.innerHTML += `<h3>Výsledky byly uloženy do souboru:</h3><pre>${saveData.file_path}</pre>`;
-            alert("Výsledky byly uloženy do souboru!");
+            
+            // Zobrazení tlačítka pro stažení, pokud jsou výsledky dostupné
+            const downloadButton = document.getElementById("download-results");
+            if (results.length > 0) {
+                downloadButton.style.display = "inline-block";
+                downloadButton.onclick = () => downloadResults(results);
+            } else {
+                downloadButton.style.display = "none";
+            }
         });
+
+        // Funkce pro stažení výsledků jako JSON
+        function downloadResults(results) {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(results, null, 2));
+            const downloadAnchor = document.createElement("a");
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "vysledky.json");
+            downloadAnchor.click();
+        }
     </script>
 </body>
 </html>
+

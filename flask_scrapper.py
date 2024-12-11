@@ -1,38 +1,14 @@
 from flask import Flask, request, jsonify, render_template
 import requests
 from bs4 import BeautifulSoup
-import json
-import os
 import logging
 
-
 app = Flask(__name__)
-
-# Cesta ke složce "vysledky" v kořenovém adresáři
-RESULTS_DIR = os.path.join(os.getcwd(), "result")
-RESULTS_FILE = os.path.join(RESULTS_DIR, "vysledky.json")
-# Funkce pro vytvoření složky, pokud neexistuje
-if not os.path.exists(RESULTS_DIR):
-    os.makedirs(RESULTS_DIR)
 
 @app.route('/')
 def home():
     logging.info("Načítám hlavní stránku.")
     return render_template('index.html')
-
-def save():
-    try:
-        data = request.json
-        logging.info(f"Ukládám data: {data}")
-        # Uložení dat do souboru
-        with open(RESULTS_FILE, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
-
-        logging.info(f"Data úspěšně uložena do souboru: {RESULTS_FILE}")
-        return jsonify({"message": "Data byla uložena.", "file_path": RESULTS_FILE})
-    except Exception as e:
-        logging.error(f"Chyba při ukládání dat: {e}")
-        return jsonify({"error": str(e)}), 500
 
 @app.route('/search', methods=['GET'])
 def search():
@@ -48,10 +24,9 @@ def search():
         results = []
         for g in soup.find_all('div', class_='tF2Cxc'):
             title = g.find('h3').text if g.find('h3') else None
-            link = g.find('a')['href'] if g.find('a') else None
-            snippet = g.find('span', class_='aCOpRe').text if g.find('span', class_='aCOpRe') else None
+            link = g.find('a')['href'] if g.find('a') else None            
             if title and link:
-                results.append({'title': title, 'link': link, 'snippet': snippet})
+                results.append({'title': title, 'link': link})
         
         logging.info(f"Nalezeno {len(results)} výsledků.")
         return jsonify(results)
