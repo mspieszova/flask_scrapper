@@ -23,7 +23,7 @@
 
     <!-- JavaScript -->
     <script>
-    document.getElementById("search-form").addEventListener("submit", async (event) => {
+   document.getElementById("search-form").addEventListener("submit", async (event) => {
     event.preventDefault();
     const query = document.getElementById("query").value;
     const resultsDiv = document.getElementById("results");
@@ -46,7 +46,7 @@
         }
 
         const results = await response.json();
-
+       
         // Clear previous results
         resultsDiv.innerHTML = `<h2>Výsledky:</h2>`;
 
@@ -57,7 +57,7 @@
             return;
         }
 
-        // Display results with error handling
+        // Display results
         results.forEach(result => {
             if (result.title && result.link) {
                 resultsDiv.innerHTML += `
@@ -69,14 +69,25 @@
             }
         });
 
-        // Show download button
-        downloadButton.style.display = results.length > 0 ? "inline-block" : "none";
+        // Show download button and attach event listener
+        downloadButton.style.display = "inline-block";
+        downloadButton.onclick = () => downloadResults(results); // Pass results to download function
     } catch (error) {
         console.error('Search error:', error);
         resultsDiv.innerHTML = `<p>Chyba při hledání: ${error.message}</p>`;
         downloadButton.style.display = "none";
     }
 });
+
+// Funkce pro stažení výsledků jako JSON
+function downloadResults(results) {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(results, null, 2));
+    const downloadAnchor = document.createElement("a");
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", "vysledky.json");
+    downloadAnchor.click();
+}
+
 </script>
 </body>
 </html>
