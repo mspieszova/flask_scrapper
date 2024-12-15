@@ -1,4 +1,29 @@
-document.getElementById("search-form").addEventListener("submit", async (event) => {
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vyhledávač Google</title>
+</head>
+<body>
+    <h1>Vyhledávač Google</h1>
+    <!-- Formulář pro zadání klíčových slov -->
+    <form id="search-form">
+        <label for="query">Zadejte klíčová slova pro vyhledávání:</label>
+        <input type="text" id="query" name="query" required>
+        <button type="submit">Hledat</button>
+    </form>
+
+    <!-- Div pro zobrazení výsledků -->
+    <div id="results"></div>
+
+    <!-- Tlačítko pro stažení výsledků -->
+    <button id="download-results" style="display: none; margin-top: 20px;">Stáhnout výsledky</button>
+
+
+    <!-- JavaScript -->
+    <script>
+    document.getElementById("search-form").addEventListener("submit", async (event) => {
     event.preventDefault();
     const query = document.getElementById("query").value;
     const resultsDiv = document.getElementById("results");
@@ -52,3 +77,6 @@ document.getElementById("search-form").addEventListener("submit", async (event) 
         downloadButton.style.display = "none";
     }
 });
+</script>
+</body>
+</html>
