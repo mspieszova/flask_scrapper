@@ -34,12 +34,12 @@
         resultsDiv.innerHTML = '<p>Načítání...</p>';
         
         // Use full URL if running on different port/domain
-        const response = await fetch(`http://localhost:5000/search?query=${encodeURIComponent(query)}`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
+        const response = await fetch(`/search?query=${encodeURIComponent(query)}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json'
+        }});
+        
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
