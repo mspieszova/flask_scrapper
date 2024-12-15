@@ -30,8 +30,12 @@ def search():
             if title and link:
                 results.append({'title': title, 'link': link})               
         return jsonify(results)
-    except Exception as e:       
-        return jsonify({"error": str(e)}), 500
+    except requests.RequestException as e:
+        print(f"Request error: {e}")
+        return jsonify({"error": "Failed to fetch search results"}), 500
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        return jsonify({"error": "An unexpected error occurred"}), 500
 
 if __name__ == '__main__':    
     app.run(host='0.0.0.0', port=5000, debug=True)
