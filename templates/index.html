@@ -1,67 +1,54 @@
-<!DOCTYPE html>
-<html lang="cs">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vyhledávač Google</title>
-</head>
-<body>
-    <h1>Vyhledávač Google</h1>
-    <!-- Formulář pro zadání klíčových slov -->
-    <form id="search-form">
-        <label for="query">Zadejte klíčová slova pro vyhledávání:</label>
-        <input type="text" id="query" name="query" required>
-        <button type="submit">Hledat</button>
-    </form>
+document.getElementById("search-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const query = document.getElementById("query").value;
+    const resultsDiv = document.getElementById("results");
+    const downloadButton = document.getElementById("download-results");
 
-    <!-- Div pro zobrazení výsledků -->
-    <div id="results"></div>
+    try {
+        // Add loading indicator
+        resultsDiv.innerHTML = '<p>Načítání...</p>';
+        
+        // Use full URL if running on different port/domain
+        const response = await fetch(`http://localhost:5000/search?query=${encodeURIComponent(query)}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
 
-    <!-- Tlačítko pro stažení výsledků -->
-    <button id="download-results" style="display: none; margin-top: 20px;">Stáhnout výsledky</button>
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
+        const results = await response.json();
 
-    <!-- JavaScript -->
-    <script>
-        document.getElementById("search-form").addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const query = document.getElementById("query").value;
-            
-            // Odeslání požadavku na server
-            const response = await fetch(`/search?query=${encodeURIComponent(query)}`);
-            const results = await response.json();
-            
-            // Zobrazení výsledků na stránce
-            const resultsDiv = document.getElementById("results");
-            resultsDiv.innerHTML = `<h2>Výsledky:</h2>`;
-            results.forEach(result => {
+        // Clear previous results
+        resultsDiv.innerHTML = `<h2>Výsledky:</h2>`;
+
+        // Handle no results
+        if (results.length === 0) {
+            resultsDiv.innerHTML += '<p>Nebyly nalezeny žádné výsledky.</p>';
+            downloadButton.style.display = "none";
+            return;
+        }
+
+        // Display results with error handling
+        results.forEach(result => {
+            if (result.title && result.link) {
                 resultsDiv.innerHTML += `
                     <div>
                         <h3>${result.title}</h3>
                         <a href="${result.link}" target="_blank">${result.link}</a>
                     </div>
                 `;
-            });
-            
-            // Zobrazení tlačítka pro stažení, pokud jsou výsledky dostupné
-            const downloadButton = document.getElementById("download-results");
-            if (results.length > 0) {
-                downloadButton.style.display = "inline-block";
-                downloadButton.onclick = () => downloadResults(results);
-            } else {
-                downloadButton.style.display = "none";
             }
         });
 
-        // Funkce pro stažení výsledků jako JSON
-        function downloadResults(results) {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(results, null, 2));
-            const downloadAnchor = document.createElement("a");
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "vysledky.json");
-            downloadAnchor.click();
-        }
-    </script>
-</body>
-</html>
-
+        // Show download button
+        downloadButton.style.display = results.length > 0 ? "inline-block" : "none";
+    } catch (error) {
+        console.error('Search error:', error);
+        resultsDiv.innerHTML = `<p>Chyba při hledání: ${error.message}</p>`;
+        downloadButton.style.display = "none";
+    }
+});

@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS 
 import requests
 from bs4 import BeautifulSoup
 
 
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/')
 def home():
@@ -15,10 +17,10 @@ def home():
 def search():
     try:
         query = request.args.get('query')        
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"
-        }
-        response = requests.get(f"https://www.google.com/search?q={query}", headers=headers)
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9"}
+        response = requests.get(f"https://www.google.com/search?q={query}", headers=headers,timeout=10)
+        response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
         
         results = []
